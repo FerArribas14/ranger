@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -16,18 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if [ ! -e ${HIVE_HOME}/.setupDone ]
-then
-  ${RANGER_SCRIPTS}/ranger-hive-setup.sh
+FROM elasticsearch:7.17.24
 
-  touch ${HIVE_HOME}/.setupDone
-fi
-
-# Start Hive MetaStore
-su -c "nohup ${HIVE_HOME}/bin/hive --service metastore > metastore.log 2>&1 &" hive
-
-# Start HiveServer2
-su -c "nohup ${HIVE_HOME}/bin/hive --service hiveserver2  > hive-server2.log 2>&1 &" hive
-
-# merge the logs and prevent the container from exiting
-tail -f hive-server2.log -f metastore.log
+USER elasticsearch

@@ -166,7 +166,7 @@ then
 
     DOCKER_COMPOSE_FLAGS="-d"
 
-    chmod +x download-archives.sh && ./download-archives.sh
+    chmod +x download-archives.sh && ./download-archives.sh hive
 
     if [ -z "${RANGER_REBUILD}" ]
     then
