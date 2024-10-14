@@ -59,6 +59,10 @@
                     <groupId>org.apache.hadoop</groupId>
                     <artifactId>hadoop-common</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.apache.hadoop.thirdparty</groupId>
+                    <artifactId>hadoop-shaded-guava</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -159,6 +163,10 @@
                 <exclusion>
                     <groupId>org.apache.kerby</groupId>
                     <artifactId>kerb-admin</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.hadoop.thirdparty</groupId>
+                    <artifactId>hadoop-shaded-guava</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
