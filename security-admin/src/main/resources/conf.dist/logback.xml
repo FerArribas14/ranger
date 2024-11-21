@@ -21,13 +21,13 @@
     <!--See http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
     <!--and http://logback.qos.ch/manual/appenders.html#TimeBasedRollingPolicy-->
     <!--for further documentation-->
-    <file>${logdir}/ranger-admin-${hostname}-${user}.log</file>
+    <file>${logdir}/ranger-admin.log</file>
     <append>true</append>
     <encoder>
       <pattern>%date [%thread] %level{5} [%file:%line] %msg%n</pattern>
     </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${logdir}/ranger-admin-${hostname}-${user}.log.%d{yyyy-MM-dd}</fileNamePattern>
+      <fileNamePattern>${logdir}/ranger-admin.log.%d{yyyy-MM-dd}</fileNamePattern>
       <maxHistory>15</maxHistory>
       <cleanHistoryOnStart>true</cleanHistoryOnStart>
     </rollingPolicy>
@@ -105,13 +105,16 @@
   <logger name="org.hibernate.SQL" additivity="false" level="warn">
     <appender-ref ref="sql_appender"/>
   </logger>
-  <logger name="org.apache.ranger" additivity="false" level="info">
+  <logger name="org.apache.ranger" additivity="false" level="debug">
+    <appender-ref ref="xa_log_appender"/>
+  </logger>
+  <logger name="org.apache.ranger.rest" additivity="false" level="debug">
     <appender-ref ref="xa_log_appender"/>
   </logger>
   <logger name="jdbc.sqlonly" additivity="false" level="error">
     <appender-ref ref="sql_appender"/>
   </logger>
-  <root level="warn">
+  <root level="debug">
     <appender-ref ref="xa_log_appender"/>
   </root>
 </configuration>
