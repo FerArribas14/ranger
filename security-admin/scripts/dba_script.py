@@ -158,7 +158,7 @@ class BaseDB(object):
 	def create_db(self, root_user, db_root_password, db_name, db_user, db_password,dryMode):
 		log("[I] ---------- Verifying database ----------", "info")
 
-	def create_auditdb_user(self, xa_db_host, audit_db_host, db_name, audit_db_name, xa_db_root_user, audit_db_root_user, db_user, audit_db_user, xa_db_root_password, audit_db_root_password, db_password, audit_db_password, DBA_MODE, dryMode):
+	def create_auditdb_user(self, xa_db_host, audit_db_host, db_name, audit_db_name, xa_db_root_user, audit_db_root_user, db_user, audit_db_user, xa_db_root_password, audit_db_root_password, db_password, audit_db_password, DBA_MODE, dryMode, db_scheme):
 		log("[I] ---------- Create audit user ----------", "info")
 
 
@@ -328,7 +328,7 @@ class MysqlConf(BaseDB):
 				logFile("create database %s;" %(db_name))
 
 
-	def grant_xa_db_user(self, root_user, db_name, db_user, db_password, db_root_password, is_revoke,dryMode):
+	def grant_xa_db_user(self, root_user, db_name, db_user, db_password, db_root_password, is_revoke,dryMode,db_scheme):
 		hosts_arr =["%", "localhost"]
 		if not self.host == "localhost": hosts_arr.append(self.host)
 		for host in hosts_arr:
@@ -364,14 +364,14 @@ class MysqlConf(BaseDB):
 			else:
 				logFile("grant all privileges on %s.* to '%s'@'%s' with grant option;" %(db_name,db_user, host))
 
-	def create_auditdb_user(self, xa_db_host, audit_db_host, db_name, audit_db_name, xa_db_root_user, audit_db_root_user, db_user, audit_db_user, xa_db_root_password, audit_db_root_password, db_password, audit_db_password, DBA_MODE,dryMode):
+	def create_auditdb_user(self, xa_db_host, audit_db_host, db_name, audit_db_name, xa_db_root_user, audit_db_root_user, db_user, audit_db_user, xa_db_root_password, audit_db_root_password, db_password, audit_db_password, DBA_MODE,dryMode,db_scheme):
 		is_revoke=False
 		if DBA_MODE == "TRUE" :
 			if dryMode == False:
 				log("[I] ---------- Setup audit user ----------","info")
 			self.create_rangerdb_user(audit_db_root_user, audit_db_user, audit_db_password, audit_db_root_password,dryMode)
 			self.create_db(audit_db_root_user, audit_db_root_password, audit_db_name, db_user, db_password,dryMode)
-			self.grant_xa_db_user(audit_db_root_user, audit_db_name, db_user, db_password, audit_db_root_password, is_revoke,dryMode)
+			self.grant_xa_db_user(audit_db_root_user, audit_db_name, db_user, db_password, audit_db_root_password, is_revoke,dryMode,db_scheme)
 
 	def writeDrymodeCmd(self, xa_db_host, audit_db_host, xa_db_root_user, xa_db_root_password, db_user, db_password, db_name, audit_db_root_user, audit_db_root_password, audit_db_user, audit_db_password, audit_db_name):
 		logFile("# Login to MySQL Server from a MySQL dba user(i.e 'root') to execute below sql statements.")
@@ -623,7 +623,7 @@ class OracleConf(BaseDB):
 			else:
 				logFile("alter user %s DEFAULT Tablespace %s;" %(audit_db_user, audit_db_name))
 
-	def grant_xa_db_user(self, root_user, db_name, db_user, db_password, db_root_password, invoke,dryMode):
+	def grant_xa_db_user(self, root_user, db_name, db_user, db_password, db_root_password, invoke,dryMode, db_scheme):
 		if dryMode == False:
 			get_cmd = self.get_jisql_cmd(root_user ,db_root_password)
 			if is_unix:
@@ -643,7 +643,7 @@ class OracleConf(BaseDB):
 		else:
 			logFile("GRANT CREATE SESSION,CREATE PROCEDURE,CREATE TABLE,CREATE VIEW,CREATE SEQUENCE,CREATE SYNONYM,CREATE TRIGGER,UNLIMITED Tablespace TO %s;" % (db_user))
 
-	def create_auditdb_user(self, xa_db_host , audit_db_host , db_name ,audit_db_name, xa_db_root_user, audit_db_root_user, db_user, audit_db_user, xa_db_root_password, audit_db_root_password, db_password, audit_db_password, DBA_MODE,dryMode):
+	def create_auditdb_user(self, xa_db_host , audit_db_host , db_name ,audit_db_name, xa_db_root_user, audit_db_root_user, db_user, audit_db_user, xa_db_root_password, audit_db_root_password, db_password, audit_db_password, DBA_MODE,dryMode,db_scheme):
 		if DBA_MODE == "TRUE":
 			if dryMode == False:
 				log("[I] ---------- Setup audit user ----------","info")
@@ -860,7 +860,7 @@ class PostgresConf(BaseDB):
 			else:
 				logFile("CREATE DATABASE \"%s\" WITH OWNER \"%s\";" %(db_name, db_user))
 
-	def grant_xa_db_user(self, root_user, db_name, db_user, db_password, db_root_password , is_revoke,dryMode):
+	def grant_xa_db_user(self, root_user, db_name, db_user, db_password, db_root_password , is_revoke,dryMode,db_scheme):
 		if dryMode == False:
 			log("[I] Granting privileges TO user '"+db_user+"' on db '"+db_name+"'" , "info")
 			get_cmd = self.get_jisql_cmd(root_user, db_root_password, db_name)
@@ -877,33 +877,33 @@ class PostgresConf(BaseDB):
 				sys.exit(1)
 
 			if is_unix:
-				query = get_cmd + " -query \"GRANT ALL PRIVILEGES ON SCHEMA public TO \\\"%s\\\";\"" %(db_user)
+				query = get_cmd + " -query \"GRANT ALL PRIVILEGES ON SCHEMA %s TO \\\"%s\\\";\"" %(db_scheme,db_user)
 				jisql_log(query, db_root_password)
 				ret = subprocessCallWithRetry(shlex.split(query))
 			elif os_name == "WINDOWS":
-				query = get_cmd + " -query \"GRANT ALL PRIVILEGES ON SCHEMA public TO \\\"%s\\\";\" -c ;" %(db_user)
+				query = get_cmd + " -query \"GRANT ALL PRIVILEGES ON SCHEMA %s TO \\\"%s\\\";\" -c ;" %(db_scheme,db_user)
 				jisql_log(query, db_root_password)
 				ret = subprocessCallWithRetry(query)
 			if ret != 0:
-				log("[E] Granting all privileges on schema public to user "+db_user+" failed..", "error")
+				log("[E] Granting all privileges on schema "+ db_scheme +" to user "+db_user+" failed..", "error")
 				sys.exit(1)
 
 			if is_unix:
-				query = get_cmd + " -query \"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO \\\"%s\\\";\"" %(db_user)
+				query = get_cmd + " -query \"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA %s TO \\\"%s\\\";\"" %(db_scheme,db_user)
 				jisql_log(query, db_root_password)
 				ret = subprocessCallWithRetry(shlex.split(query))
 			elif os_name == "WINDOWS":
-				query = get_cmd + " -query \"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO \\\"%s\\\";\" -c ;" %(db_user)
+				query = get_cmd + " -query \"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA %s TO \\\"%s\\\";\" -c ;"%(db_scheme,db_user)
 				jisql_log(query, db_root_password)
 				ret = subprocessCallWithRetry(query)
 			if ret != 0:
-				log("[E] Granting all privileges on all tables in schema public to user "+db_user+" failed..", "error")
+				log("[E] Granting all privileges on all tables in schema "+ db_scheme +" to user "+db_user+" failed..", "error")
 				if is_unix:
-					query = get_cmd + " -query \"SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';\""
+					query = get_cmd + " -query \"SELECT table_name FROM information_schema.tables WHERE table_schema = '%s';\"" %(db_scheme)
 					jisql_log(query, db_root_password)
 					output = check_output(query)
 				elif os_name == "WINDOWS":
-					query = get_cmd + " -query \"SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';\" -c ;"
+					query = get_cmd + " -query \"SELECT table_name FROM information_schema.tables WHERE table_schema = '%s';\" -c ;" %(db_scheme)
 					jisql_log(query, db_root_password)
 					output = check_output(query)
 				for each_line in output.split('\n'):
@@ -928,20 +928,20 @@ class PostgresConf(BaseDB):
 
 
 			if is_unix:
-				query = get_cmd + " -query \"GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO \\\"%s\\\";\"" %(db_user)
+				query = get_cmd + " -query \"GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA %s TO \\\"%s\\\";\"" %(db_scheme, db_user)
 				jisql_log(query, db_root_password)
 				ret = subprocessCallWithRetry(shlex.split(query))
 			elif os_name == "WINDOWS":
-				query = get_cmd + " -query \"GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO \\\"%s\\\";\" -c ;" %(db_user)
+				query = get_cmd + " -query \"GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA %s TO \\\"%s\\\";\" -c ;" %(db_scheme, db_user)
 				jisql_log(query, db_root_password)
 				ret = subprocessCallWithRetry(query)
 			if ret!=0:
-				log("[E] Granting all privileges on all sequences in schema public to user "+db_user+" failed..", "error")
+				log("[E] Granting all privileges on all sequences in schema "+ db_scheme +" to user "+db_user+" failed..", "error")
 				if is_unix:
-					query = get_cmd + " -query \"SELECT sequence_name FROM information_schema.sequences where sequence_schema='public';\""
+					query = get_cmd + " -query \"SELECT sequence_name FROM information_schema.sequences where sequence_schema='%s';\"" %(db_scheme)
 					output = check_output(query)
 				elif os_name == "WINDOWS":
-					query = get_cmd + " -query \"SELECT sequence_name FROM information_schema.sequences where sequence_schema='public';\" -c ;"
+					query = get_cmd + " -query \"SELECT sequence_name FROM information_schema.sequences where sequence_schema='%s';\" -c ;" %(db_scheme)
 					jisql_log(query, db_root_password)
 					output = check_output(query)
 				for each_line in output.split('\n'):
@@ -967,11 +967,11 @@ class PostgresConf(BaseDB):
 			log("[I] Granting privileges TO user '"+db_user+"' on db '"+db_name+"' Done" , "info")
 		else:
 			logFile("GRANT ALL PRIVILEGES ON DATABASE %s to \"%s\";" %(db_name, db_user))
-			logFile("GRANT ALL PRIVILEGES ON SCHEMA public TO \"%s\";" %( db_user))
-			logFile("GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO \"%s\";" %(db_user))
-			logFile("GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO \"%s\";" %(db_user))
+			logFile("GRANT ALL PRIVILEGES ON SCHEMA %s TO \"%s\";" %( db_scheme, db_user))
+			logFile("GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA %s TO \"%s\";" %(db_scheme, db_user))
+			logFile("GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA %s TO \"%s\";" %(db_scheme, db_user))
 
-	def create_auditdb_user(self, xa_db_host, audit_db_host, db_name, audit_db_name, xa_db_root_user, audit_db_root_user, db_user, audit_db_user, xa_db_root_password, audit_db_root_password, db_password, audit_db_password, DBA_MODE,dryMode):
+	def create_auditdb_user(self, xa_db_host, audit_db_host, db_name, audit_db_name, xa_db_root_user, audit_db_root_user, db_user, audit_db_user, xa_db_root_password, audit_db_root_password, db_password, audit_db_password, DBA_MODE,dryMode,db_scheme):
 		if DBA_MODE == "TRUE":
 			if dryMode == False:
 				log("[I] ---------- Setup audit user ----------","info")
@@ -982,13 +982,13 @@ class PostgresConf(BaseDB):
 		if DBA_MODE == "TRUE":
 			self.grant_xa_db_user(audit_db_root_user, audit_db_name, db_user, db_password, audit_db_root_password, False,dryMode)
 
-	def writeDrymodeCmd(self, xa_db_host, audit_db_host, xa_db_root_user, xa_db_root_password, db_user, db_password, db_name, audit_db_root_user, audit_db_root_password, audit_db_user, audit_db_password, audit_db_name):
+	def writeDrymodeCmd(self, xa_db_host, audit_db_host, xa_db_root_user, xa_db_root_password, db_user, db_password, db_name, audit_db_root_user, audit_db_root_password, audit_db_user, audit_db_password, audit_db_name, audit_db_scheme):
 		logFile("# Login to POSTGRES Server from a POSTGRES dba user(i.e 'postgres') to execute below sql statements.")
 		logFile("CREATE USER \"%s\" WITH LOGIN PASSWORD '%s';" %(db_user, db_password))
 		logFile("CREATE DATABASE \"%s\" WITH OWNER \"%s\";" %(db_name, db_user))
 		logFile("# Login to POSTGRES Server from a POSTGRES dba user(i.e 'postgres') on '%s' database to execute below sql statements."%(db_name))
 		logFile("GRANT ALL PRIVILEGES ON DATABASE \"%s\" TO \"%s\";" %(db_name, db_user))
-		logFile("GRANT ALL PRIVILEGES ON SCHEMA public TO \"%s\";" %(db_user))
+		logFile("GRANT ALL PRIVILEGES ON SCHEMA \"%s\" TO \"%s\";" %(audit_db_scheme, db_user))
 		if not db_user == audit_db_user:
 			logFile("# Login to POSTGRES Server from a POSTGRES dba user(i.e 'postgres') to execute below sql statements.")
 			logFile("CREATE USER \"%s\" WITH LOGIN PASSWORD \"%s\";" %(audit_db_user, audit_db_password))
@@ -1000,7 +1000,7 @@ class PostgresConf(BaseDB):
 			logFile("CREATE DATABASE \"%s\" WITH OWNER \"%s\";" %(audit_db_name, db_user))
 			logFile("# Login to POSTGRES Server from a POSTGRES dba user(i.e 'postgres') on '%s' database to execute below sql statements."%(audit_db_name))
 			logFile("GRANT ALL PRIVILEGES ON DATABASE \"%s\" TO \"%s\";" %(audit_db_name, db_user))
-			logFile("GRANT ALL PRIVILEGES ON SCHEMA public TO \"%s\";" %(db_user))
+			logFile("GRANT ALL PRIVILEGES ON SCHEMA %s TO \"%s\";" %(audit_db_scheme, db_user))
 
 class SqlServerConf(BaseDB):
 	# Constructor
@@ -1153,7 +1153,7 @@ class SqlServerConf(BaseDB):
 			else:
 				logFile("CREATE USER %s for LOGIN %s;" %(db_user, db_user))
 
-	def grant_xa_db_user(self, root_user, db_name, db_user, db_password, db_root_password, is_revoke,dryMode):
+	def grant_xa_db_user(self, root_user, db_name, db_user, db_password, db_root_password, is_revoke,dryMode, db_scheme):
 		if dryMode == False:
 			log("[I] Granting permission to admin user '" + db_user + "' on db '" + db_name + "'" , "info")
 			get_cmd = self.get_jisql_cmd(root_user, db_root_password, db_name)
@@ -1170,7 +1170,7 @@ class SqlServerConf(BaseDB):
 		else:
 			logFile("EXEC sp_addrolemember N'db_owner', N'%s';" %(db_user))
 
-	def create_auditdb_user(self, xa_db_host, audit_db_host, db_name, audit_db_name, xa_db_root_user, audit_db_root_user, db_user, audit_db_user, xa_db_root_password, audit_db_root_password, db_password, audit_db_password, DBA_MODE,dryMode):
+	def create_auditdb_user(self, xa_db_host, audit_db_host, db_name, audit_db_name, xa_db_root_user, audit_db_root_user, db_user, audit_db_user, xa_db_root_password, audit_db_root_password, db_password, audit_db_password, DBA_MODE,dryMode, db_scheme):
 		is_revoke=False
 		if DBA_MODE == "TRUE":
 			if dryMode == False:
@@ -1180,7 +1180,7 @@ class SqlServerConf(BaseDB):
 			self.create_rangerdb_user(audit_db_root_user, audit_db_user, audit_db_password, audit_db_root_password,dryMode)
 			self.create_db(audit_db_root_user, audit_db_root_password ,audit_db_name, audit_db_user, audit_db_password,dryMode)
 			self.create_user(xa_db_root_user, audit_db_name ,db_user, db_password, xa_db_root_password,dryMode)
-			self.grant_xa_db_user(audit_db_root_user, audit_db_name, db_user, db_password, audit_db_root_password, is_revoke, dryMode)
+			self.grant_xa_db_user(audit_db_root_user, audit_db_name, db_user, db_password, audit_db_root_password, is_revoke, dryMode, db_scheme)
 
 	def writeDrymodeCmd(self, xa_db_host, audit_db_host, xa_db_root_user, xa_db_root_password, db_user, db_password, db_name, audit_db_root_user, audit_db_root_password, audit_db_user, audit_db_password, audit_db_name):
 		logFile("# Login to MSSQL Server from a MSSQL dba user(i.e 'sa') to execute below sql statements.")
@@ -1377,7 +1377,7 @@ class SqlAnywhereConf(BaseDB):
 			else:
 				logFile("CREATE USER %s IDENTIFIED BY '%s';" %(db_user, db_password))
 
-	def grant_xa_db_user(self, root_user, db_name, db_user, db_password, db_root_password, is_revoke,dryMode):
+	def grant_xa_db_user(self, root_user, db_name, db_user, db_password, db_root_password, is_revoke,dryMode, db_scheme):
 		if dryMode == False:
 			log("[I] Granting permission to user '" + db_user + "' on db '" + db_name + "'" , "info")
 			get_cmd = self.get_jisql_cmd(root_user, db_root_password, db_name)
@@ -1396,7 +1396,7 @@ class SqlAnywhereConf(BaseDB):
 		else:
 			logFile("GRANT CONNECT to %s IDENTIFIED BY '%s';" %(db_user, db_password))
 
-	def create_auditdb_user(self, xa_db_host, audit_db_host, db_name, audit_db_name, xa_db_root_user, audit_db_root_user, db_user, audit_db_user, xa_db_root_password, audit_db_root_password, db_password, audit_db_password, DBA_MODE,dryMode):
+	def create_auditdb_user(self, xa_db_host, audit_db_host, db_name, audit_db_name, xa_db_root_user, audit_db_root_user, db_user, audit_db_user, xa_db_root_password, audit_db_root_password, db_password, audit_db_password, DBA_MODE,dryMode,db_scheme):
 		is_revoke=False
 		if DBA_MODE == "TRUE":
 			if dryMode == False:
@@ -1575,6 +1575,17 @@ def main(argv):
 				db_name=input()
 
 	if (quiteMode):
+		db_scheme = globalDict['db_scheme']
+	else:
+		if (dryMode):
+			db_scheme='public'
+		else:
+			db_scheme = ''
+			while db_scheme == "":
+				log("Enter DB Scheme :","info")
+				db_scheme=input()
+
+	if (quiteMode):
 		db_user = globalDict['db_user']
 	else:
 		if (dryMode):
@@ -1616,6 +1627,18 @@ def main(argv):
 				while audit_db_name == "":
 					log("Enter audit db name:","info")
 					audit_db_name = input()
+
+		if (quiteMode):
+			if 'audit_db_scheme' in globalDict:
+				audit_db_scheme = globalDict['audit_db_scheme']
+		else:
+			if (dryMode):
+				audit_db_scheme='public'
+			else:
+				audit_db_scheme=''
+				while audit_db_scheme == "":
+					log("Enter audit db scheme:","info")
+					audit_db_scheme = input()
 
 		if (quiteMode):
 			if 'audit_db_user' in globalDict:
@@ -1812,12 +1835,12 @@ def main(argv):
 			xa_sqlObj.create_db(xa_db_root_user, xa_db_root_password, db_name, db_user, db_password,dryMode)
 			log("[I] ---------- Granting permission to Ranger Admin db user ----------","info")
 			if not XA_DB_FLAVOR == "SQLA":
-				xa_sqlObj.grant_xa_db_user(xa_db_root_user, db_name, db_user, db_password, xa_db_root_password, is_revoke,dryMode)
+				xa_sqlObj.grant_xa_db_user(xa_db_root_user, db_name, db_user, db_password, xa_db_root_password, is_revoke,dryMode, db_scheme)
 			# Ranger Admin DB Host AND Ranger Audit DB Host are Different OR Same
 			if audit_store == "db" and audit_db_password!="":
 				log("[I] ---------- Verifying Ranger Audit db user password ---------- ","info")
 				password_validation(audit_db_password,"audit");
 				log("[I] ---------- Verifying/Creating audit user --------- ","info")
-				audit_sqlObj.create_auditdb_user(xa_db_host, audit_db_host, db_name, audit_db_name, xa_db_root_user, audit_db_root_user, db_user, audit_db_user, xa_db_root_password, audit_db_root_password, db_password, audit_db_password, DBA_MODE,dryMode)
+				audit_sqlObj.create_auditdb_user(xa_db_host, audit_db_host, db_name, audit_db_name, xa_db_root_user, audit_db_root_user, db_user, audit_db_user, xa_db_root_password, audit_db_root_password, db_password, audit_db_password, DBA_MODE,dryMode, audit_db_scheme)
 			log("[I] ---------- Ranger Policy Manager DB and User Creation Process Completed..  ---------- ","info")
 main(sys.argv)

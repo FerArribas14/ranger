@@ -879,8 +879,10 @@ public class RangerPolicyValidator extends RangerValidator {
 			String name = entry.getKey();
 			RangerPolicyResource policyResource = entry.getValue();
 			if(policyResource != null) {
-				policyResource.getValues().removeIf(StringUtils::isBlank);
-				if(CollectionUtils.isEmpty(policyResource.getValues())){
+				if (policyResource.getValues() != null) {
+					policyResource.getValues().removeIf(StringUtils::isBlank);
+				}
+				if(policyResource.getValues() == null || CollectionUtils.isEmpty(policyResource.getValues())){
 					ValidationErrorCode error = ValidationErrorCode.POLICY_VALIDATION_ERR_MISSING_RESOURCE_LIST;
 					if(LOG.isDebugEnabled()) {
 						LOG.debug(String.format("Resource list was empty or contains null: value[%s], resource-name[%s], service-def-name[%s]", policyResource.getValues(), name, serviceDef.getName()));
