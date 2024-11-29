@@ -42,11 +42,11 @@
                     <include>org.apache.hadoop.thirdparty:hadoop-shaded-guava:jar:${hadoop-shaded-guava.version}</include>
                     <include>org.apache.hadoop:hadoop-auth:jar:${hadoop.version}</include>
                     <include>org.eclipse.persistence:eclipselink</include>
-                    <include>org.eclipse.persistence:javax.persistence</include>
+                    <include>org.eclipse.persistence:jakarta.persistence</include>
                     <include>com.googlecode.log4jdbc:log4jdbc</include>
                     <include>com.codahale.metrics:metrics-core</include>
                     <include>org.slf4j:jul-to-slf4j</include>
-                    <include>javax.servlet:servlet-api</include>
+                    <include>jakarta.servlet:jakarta.servlet-api</include>
                     <include>org.mortbay.jetty:jetty</include>
                     <include>org.mortbay.jetty:jetty-util</include>
                     <include>org.apache.zookeeper:zookeeper:jar:${zookeeper.version}</include>
@@ -150,7 +150,7 @@
                     <include>io.grpc:grpc-protobuf</include>
                     <include>io.grpc:grpc-protobuf-lite</include>
                     <include>com.google.api:api-common</include>
-                    <include>javax.annotation:javax.annotation-api</include>
+                    <include>jakarta.annotation:jakarta.annotation-api</include>
                     <include>com.google.auto.value:auto-value-annotations</include>
                     <include>com.google.api.grpc:proto-google-common-protos</include>
                     <include>com.google.api.grpc:proto-google-cloud-kms-v1</include>
@@ -229,7 +229,7 @@
                     <include>ch.qos.logback:logback-classic:jar:${logback.version}</include>
                     <include>ch.qos.logback:logback-core:jar:${logback.version}</include>
                     <include>com.google.code.gson:gson</include>
-                    <include>com.sun.jersey:jersey-bundle</include>
+                    <include>org.glassfish.jersey.media:jersey-media-json-binding</include>
                     <include>com.fasterxml.jackson.core:jackson-annotations:jar:${fasterxml.jackson.version}</include>
                     <include>com.fasterxml.jackson.core:jackson-core:jar:${fasterxml.jackson.version}</include>
                     <include>com.fasterxml.jackson.core:jackson-databind:jar:${fasterxml.jackson.version}</include>
@@ -298,7 +298,7 @@
                             <include>org.apache.commons:commons-configuration2:jar:${commons.configuration.version}</include>
                             <include>com.google.code.gson:gson</include>
                             <include>org.eclipse.persistence:eclipselink</include>
-                            <include>org.eclipse.persistence:javax.persistence</include>
+                            <include>org.eclipse.persistence:jakarta.persistence</include>
                             <include>commons-collections:commons-collections</include>
                             <include>commons-logging:commons-logging:jar:${commons.logging.version}</include>
                             <include>org.apache.httpcomponents:httpclient:jar:${httpcomponents.httpclient.version}</include>

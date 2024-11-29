@@ -42,10 +42,10 @@
                     <include>io.airlift:log-manager:jar:${presto.airlift.version}</include>
                     <include>io.airlift:configuration:jar:${presto.airlift.version}</include>
                     <include>javax.validation:validation-api:jar:${presto.validation-api.version}</include>
-                    <include>javax.inject:javax.inject:jar:${javax-inject.version}</include>
+                    <include>jakarta.inject:jakarta.inject-api:jar:${jakarta-inject.version}</include>
                     <include>org.apache.bval:bval-jsr:jar:${presto.bval-jsr.version}</include>
                     <include>org.slf4j:slf4j-api:jar:${slf4j-api.version}</include>
-                    <include>javax.annotation:javax.annotation-api:jar:${javax.annotation-api}</include>
+                    <include>jakarta.annotation:jakarta.annotation-api:jar:${jakarta.annotation-api}</include>
                 </includes>
             </binaries>
         </moduleSet>
@@ -92,7 +92,7 @@
                     <include>org.apache.ranger:credentialbuilder</include>
                     <include>org.codehaus.woodstox:stax2-api</include>
                     <include>com.fasterxml.woodstox:woodstox-core</include>
-                    <include>com.sun.jersey:jersey-bundle</include>
+                    <include>org.glassfish.jersey.media:jersey-media-json-binding</include>
                     <include>com.sun.jersey:jersey-json</include>
                     <include>com.fasterxml.jackson.core:jackson-annotations:jar:${fasterxml.jackson.version}</include>
                     <include>com.fasterxml.jackson.core:jackson-core:jar:${fasterxml.jackson.version}</include>

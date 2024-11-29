@@ -28,11 +28,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -76,6 +76,8 @@ import org.apache.ranger.service.RangerRoleService;
 import org.apache.ranger.service.XUserService;
 import org.apache.ranger.view.RangerExportRoleList;
 import org.apache.ranger.view.RangerRoleList;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,9 +86,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.sun.jersey.multipart.FormDataParam;
-import com.sun.jersey.core.header.FormDataContentDisposition;
 
 @Path("roles")
 @Component
@@ -388,10 +387,11 @@ public class RoleREST {
         return ret;
     }
 
-	@GET
-	@Path("/roles/exportJson")
-	@Produces({ "application/json" })
-	@PreAuthorize("@rangerPreAuthSecurityHandler.isAdminRole()")
+//	ToDo: fixes jersey validations
+//	@GET
+//	@Path("/roles/exportJson")
+//	@Produces({ "application/json" })
+//	@PreAuthorize("@rangerPreAuthSecurityHandler.isAdminRole()")
 	public void getRolesInJson(@Context HttpServletRequest request, @Context HttpServletResponse response) {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("==> getRolesInJson()");
@@ -622,10 +622,11 @@ public class RoleREST {
     /*
         This API is used to add users and groups with/without GRANT privileges to this Role. It follows add-or-update semantics
      */
-    @PUT
-    @Path("/roles/{id}/addUsersAndGroups")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
+//	ToDo: fixes jersey validations
+//    @PUT
+//    @Path("/roles/{id}/addUsersAndGroups")
+//    @Consumes({ "application/json" })
+//    @Produces({ "application/json" })
     public RangerRole addUsersAndGroups(@PathParam("id") Long roleId, List<String> users, List<String> groups, Boolean isAdmin) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("==> addUsersAndGroups(id=" + roleId + ", users=" + Arrays.toString(users.toArray()) + ", groups=" + Arrays.toString(groups.toArray()) + ", isAdmin=" + isAdmin + ")");
@@ -689,10 +690,11 @@ public class RoleREST {
     /*
         This API is used to remove users and groups, without regard to their GRANT privilege, from this Role.
      */
-    @PUT
-    @Path("/roles/{id}/removeUsersAndGroups")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
+//	ToDo: fixes jersey validations
+//    @PUT
+//    @Path("/roles/{id}/removeUsersAndGroups")
+//    @Consumes({ "application/json" })
+//    @Produces({ "application/json" })
     public RangerRole removeUsersAndGroups(@PathParam("id") Long roleId, List<String> users, List<String> groups) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("==> removeUsersAndGroups(id=" + roleId + ", users=" + Arrays.toString(users.toArray()) + ", groups=" + Arrays.toString(groups.toArray()) + ")");
@@ -744,10 +746,11 @@ public class RoleREST {
     /*
         This API is used to remove GRANT privilege from listed users and groups.
      */
-    @PUT
-    @Path("/roles/{id}/removeAdminFromUsersAndGroups")
-    @Consumes({ "application/json" })
-    @Produces({ "application/json" })
+//	ToDo: fixes jersey validations
+//    @PUT
+//    @Path("/roles/{id}/removeAdminFromUsersAndGroups")
+//    @Consumes({ "application/json" })
+//    @Produces({ "application/json" })
     public RangerRole removeAdminFromUsersAndGroups(@PathParam("id") Long roleId, List<String> users, List<String> groups) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("==> removeAdminFromUsersAndGroups(id=" + roleId + ", users=" + Arrays.toString(users.toArray()) + ", groups=" + Arrays.toString(groups.toArray()) + ")");

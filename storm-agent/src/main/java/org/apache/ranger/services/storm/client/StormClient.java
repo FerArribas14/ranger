@@ -32,6 +32,10 @@ import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Response;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.security.KrbPasswordSaverLoginModule;
@@ -47,9 +51,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
 
 public class StormClient {
 
@@ -103,8 +104,8 @@ public class StormClient {
 					return null;
 				}
 
-				Client client = Client.create();
-				ClientResponse response = null;
+				Client client = ClientBuilder.newClient();
+				Response response = null;
 				for (String currentUrl : stormUIUrls) {
 					if (currentUrl == null || currentUrl.trim().isEmpty()) {
 						continue;
@@ -134,7 +135,7 @@ public class StormClient {
 							LOG.debug("getTopologyList():response.getStatus()= " + response.getStatus());
 						}
 						if (response.getStatus() == 200) {
-							String jsonString = response.getEntity(String.class);
+							String jsonString = response.readEntity(String.class);
 							Gson gson = new GsonBuilder().setPrettyPrinting().create();
 							TopologyListResponse topologyListResponse = gson.fromJson(jsonString, TopologyListResponse.class);
 							if (topologyListResponse != null) {
@@ -185,20 +186,20 @@ public class StormClient {
 					}
 
 					if (client != null) {
-						client.destroy();
+						client.close();
 					}
 				}
 				return lret;
 			}
 
-			private ClientResponse getTopologyResponse(String url, Client client) {
+			private Response getTopologyResponse(String url, Client client) {
 				if (LOG.isDebugEnabled()) {
 					LOG.debug("getTopologyResponse():calling " + url);
 				}
 
-				WebResource webResource = client.resource(url);
+				WebTarget webTarget = client.target(url);
 
-				ClientResponse response = webResource.accept(EXPECTED_MIME_TYPE).get(ClientResponse.class);
+				Response response = webTarget.request(EXPECTED_MIME_TYPE).get(Response.class);
 
 				if (response != null) {
 					if (LOG.isDebugEnabled()) {
@@ -207,7 +208,7 @@ public class StormClient {
 					if (response.getStatus() != 200) {
 						LOG.info("getTopologyResponse():response.getStatus()= " + response.getStatus() + " for URL "
 								+ url + ", failed to get topology list");
-						String jsonString = response.getEntity(String.class);
+						String jsonString = response.readEntity(String.class);
 						LOG.info(jsonString);
 					}
 				}

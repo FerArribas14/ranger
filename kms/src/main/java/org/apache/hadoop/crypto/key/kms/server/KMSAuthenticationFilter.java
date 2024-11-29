@@ -32,14 +32,14 @@ import com.google.common.annotations.VisibleForTesting;
 import org.apache.hadoop.http.HtmlQuoting;
 import org.apache.ranger.kms.metrics.KMSMetrics;
 
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponseWrapper;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
@@ -121,13 +121,6 @@ public class KMSAuthenticationFilter
     public void sendError(int sc) throws IOException {
       statusCode = sc;
       super.sendError(sc);
-    }
-
-    @Override
-    public void setStatus(int sc, String sm) {
-      statusCode = sc;
-      msg = sm;
-      super.setStatus(sc, sm);
     }
   }
 

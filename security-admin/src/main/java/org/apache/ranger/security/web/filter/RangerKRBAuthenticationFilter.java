@@ -34,24 +34,24 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Collections;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.FilterRegistration;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.Servlet;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.SessionCookieConfig;
-import javax.servlet.SessionTrackingMode;
-import javax.servlet.FilterRegistration.Dynamic;
-import javax.servlet.descriptor.JspConfigDescriptor;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.FilterRegistration;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRegistration;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.SessionCookieConfig;
+import jakarta.servlet.SessionTrackingMode;
+import jakarta.servlet.FilterRegistration.Dynamic;
+import jakarta.servlet.descriptor.JspConfigDescriptor;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.apache.commons.collections.iterators.IteratorEnumeration;
 import org.apache.hadoop.conf.Configuration;
@@ -463,10 +463,6 @@ public class RangerKRBAuthenticationFilter extends RangerKrbFilter {
 		}
 
 		@Override
-		public void log(Exception exception, String msg) {
-		}
-
-		@Override
 		public void log(String msg) {
 		}
 
@@ -476,12 +472,37 @@ public class RangerKRBAuthenticationFilter extends RangerKrbFilter {
 		}
 
 		@Override
-		public SessionCookieConfig getSessionCookieConfig() {
-			return null;
+		public int getSessionTimeout() {
+			return 0;
 		}
 
 		@Override
-		public Enumeration<Servlet> getServlets() {
+		public void setSessionTimeout(int i) {
+
+		}
+
+		@Override
+		public String getRequestCharacterEncoding() {
+			return "";
+		}
+
+		@Override
+		public void setRequestCharacterEncoding(String s) {
+
+		}
+
+		@Override
+		public String getResponseCharacterEncoding() {
+			return "";
+		}
+
+		@Override
+		public void setResponseCharacterEncoding(String s) {
+
+		}
+
+		@Override
+		public SessionCookieConfig getSessionCookieConfig() {
 			return null;
 		}
 
@@ -496,17 +517,7 @@ public class RangerKRBAuthenticationFilter extends RangerKrbFilter {
 		}
 
 		@Override
-		public Enumeration<String> getServletNames() {
-			return null;
-		}
-
-		@Override
 		public String getServletContextName() {
-			return null;
-		}
-
-		@Override
-		public Servlet getServlet(String name) throws ServletException {
 			return null;
 		}
 
@@ -655,6 +666,11 @@ public class RangerKRBAuthenticationFilter extends RangerKrbFilter {
 		@Override
 		public ServletRegistration.Dynamic addServlet(
 				String servletName, Class<? extends Servlet> servletClass) {
+			return null;
+		}
+
+		@Override
+		public ServletRegistration.Dynamic addJspFile(String s, String s1) {
 			return null;
 		}
 

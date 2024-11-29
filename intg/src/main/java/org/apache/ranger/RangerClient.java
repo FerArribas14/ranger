@@ -26,7 +26,6 @@ import org.apache.ranger.plugin.util.JsonUtilsV2;
 import org.apache.ranger.plugin.util.RangerPurgeResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.sun.jersey.api.client.ClientResponse;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.ranger.plugin.model.*;
 import org.apache.ranger.admin.client.datatype.RESTResponse;
@@ -34,9 +33,9 @@ import org.apache.ranger.plugin.util.GrantRevokeRoleRequest;
 import org.apache.ranger.plugin.util.RangerRESTClient;
 
 import java.security.PrivilegedExceptionAction;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.net.URI;
 import java.util.*;
 
@@ -483,8 +482,8 @@ public class RangerClient {
         return callAPI(PURGE_RECORDS, queryParams, null, TYPE_LIST_PURGE_RESULT);
     }
 
-    private ClientResponse invokeREST(API api, Map<String, String> params, Object request) throws RangerServiceException {
-        final ClientResponse clientResponse;
+    private Response invokeREST(API api, Map<String, String> params, Object request) throws RangerServiceException {
+        final Response clientResponse;
         try {
             switch (api.getMethod()) {
                 case HttpMethod.POST:
@@ -514,8 +513,8 @@ public class RangerClient {
         return clientResponse;
     }
 
-    private ClientResponse responseHandler(API api, Map<String, String> params, Object request) throws RangerServiceException {
-        final ClientResponse clientResponse;
+    private Response responseHandler(API api, Map<String, String> params, Object request) throws RangerServiceException {
+        final Response clientResponse;
 
         if (LOG.isDebugEnabled()){
             LOG.debug("Call         : {} {}", api.getMethod(), api.getNormalizedPath());
@@ -528,7 +527,7 @@ public class RangerClient {
 
         if (isSecureMode) {
             try {
-                clientResponse = MiscUtil.executePrivilegedAction((PrivilegedExceptionAction<ClientResponse>) () -> {
+                clientResponse = MiscUtil.executePrivilegedAction((PrivilegedExceptionAction<Response>) () -> {
                     try {
                         return invokeREST(api,params,request);
                     } catch (RangerServiceException e) {
@@ -551,7 +550,7 @@ public class RangerClient {
             throw new RangerServiceException(api, null);
         } else if (clientResponse.getStatus() == api.getExpectedStatus().getStatusCode()) {
             return clientResponse;
-        } else if (clientResponse.getStatus() == ClientResponse.Status.SERVICE_UNAVAILABLE.getStatusCode()) {
+        } else if (clientResponse.getStatus() == Response.Status.SERVICE_UNAVAILABLE.getStatusCode()) {
             LOG.error("Ranger Admin unavailable. HTTP Status: {}", clientResponse.getStatus());
         } else {
             throw new RangerServiceException(api, clientResponse);
@@ -577,7 +576,7 @@ public class RangerClient {
             LOG.debug("==> callAPI({},{},{})",api, params, request);
             LOG.debug("------------------------------------------------------");
         }
-        final ClientResponse clientResponse = responseHandler(api, params, request);
+        final Response clientResponse = responseHandler(api, params, request);
         if (responseType != null) {
             try {
                 ret = JsonUtilsV2.readResponse(clientResponse, responseType);
@@ -600,7 +599,7 @@ public class RangerClient {
             LOG.debug("==> callAPI({},{},{})",api, params, request);
             LOG.debug("------------------------------------------------------");
         }
-        final ClientResponse clientResponse = responseHandler(api, params, request);
+        final Response clientResponse = responseHandler(api, params, request);
         if (responseType != null) {
             try {
                 ret = JsonUtilsV2.readResponse(clientResponse, responseType);

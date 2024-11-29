@@ -18,7 +18,6 @@
  */
 package org.apache.ranger;
 
-import com.sun.jersey.api.client.ClientResponse;
 import org.apache.ranger.plugin.model.RangerSecurityZone;
 import org.apache.ranger.plugin.model.RangerSecurityZoneHeaderInfo;
 import org.apache.ranger.plugin.model.RangerService;
@@ -34,8 +33,8 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testng.annotations.BeforeMethod;
 
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.core.Response;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,13 +62,13 @@ public class TestRangerClient {
     public void apiGet_Success() throws Exception {
         try {
             RangerRESTClient restClient = mock(RangerRESTClient.class);
-            ClientResponse   response   = mock(ClientResponse.class);
+            Response response   = mock(Response.class);
             RangerClient     client     = new RangerClient(restClient);
             RangerService    service    = new RangerService("testType", "testService", "MockedService", "testTag", new HashMap<>());
 
             when(restClient.get(anyString(), any())).thenReturn(response);
             when(response.getStatus()).thenReturn(GET_TEST_API.getExpectedStatus().getStatusCode());
-            when(response.getEntity(String.class)).thenReturn(JsonUtilsV2.objToJson(service));
+            when(response.readEntity(String.class)).thenReturn(JsonUtilsV2.objToJson(service));
 
             RangerService ret = client.getService(service.getName());
 
@@ -84,17 +83,17 @@ public class TestRangerClient {
     public void apiGet_ServiceUnavailable() throws Exception {
         try {
             RangerRESTClient restClient = mock(RangerRESTClient.class);
-            ClientResponse   response   = mock(ClientResponse.class);
+            Response   response   = mock(Response.class);
             RangerClient     client     = new RangerClient(restClient);
 
             when(restClient.get(anyString(), any())).thenReturn(response);
-            when(response.getStatus()).thenReturn(ClientResponse.Status.SERVICE_UNAVAILABLE.getStatusCode());
+            when(response.getStatus()).thenReturn(Response.Status.SERVICE_UNAVAILABLE.getStatusCode());
 
             RangerService ret = client.getService(1L);
 
             Assertions.fail("Expected to fail with SERVICE_UNAVAILABLE");
         } catch(RangerServiceException excp){
-            Assertions.assertEquals(ClientResponse.Status.SERVICE_UNAVAILABLE,  excp.getStatus(), "Expected to fail with status SERVICE_UNAVAILABLE");
+            Assertions.assertEquals(Response.Status.SERVICE_UNAVAILABLE,  excp.getStatus(), "Expected to fail with status SERVICE_UNAVAILABLE");
         }
     }
 
@@ -102,18 +101,18 @@ public class TestRangerClient {
     public void apiGet_FailWithUnexpectedStatusCode() throws Exception {
         try {
             RangerRESTClient restClient = mock(RangerRESTClient.class);
-            ClientResponse   response   = mock(ClientResponse.class);
+            Response   response   = mock(Response.class);
             RangerClient     client     = new RangerClient(restClient);
 
             when(restClient.get(anyString(), any())).thenReturn(response);
-            when(response.getStatus()).thenReturn(ClientResponse.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+            when(response.getStatus()).thenReturn(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
 
             client.getService(1L);
 
             Assertions.fail("supposed to fail with RangerServiceException");
         } catch(RangerServiceException excp) {
-            Assertions.assertTrue(excp.getMessage().contains("statusCode=" + ClientResponse.Status.INTERNAL_SERVER_ERROR.getStatusCode()));
-            Assertions.assertTrue(excp.getMessage().contains("status=" + ClientResponse.Status.INTERNAL_SERVER_ERROR.getReasonPhrase()));
+            Assertions.assertTrue(excp.getMessage().contains("statusCode=" + Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()));
+            Assertions.assertTrue(excp.getMessage().contains("status=" + Response.Status.INTERNAL_SERVER_ERROR.getReasonPhrase()));
         }
     }
 
@@ -164,7 +163,7 @@ public class TestRangerClient {
     @Test
     public void testGetSecurityZoneHeaders() throws Exception {
         RangerRESTClient    restClient = mock(RangerRESTClient.class);
-        ClientResponse      response   = mock(ClientResponse.class);
+        Response      response   = mock(Response.class);
         RangerClient        client     = new RangerClient(restClient);
 
         List<RangerSecurityZoneHeaderInfo> expected = new ArrayList<>();
@@ -174,7 +173,7 @@ public class TestRangerClient {
 
         when(restClient.get(anyString(), any())).thenReturn(response);
         when(response.getStatus()).thenReturn(GET_TEST_API.getExpectedStatus().getStatusCode());
-        when(response.getEntity(String.class)).thenReturn(JsonUtilsV2.listToJson(expected));
+        when(response.readEntity(String.class)).thenReturn(JsonUtilsV2.listToJson(expected));
 
         List<RangerSecurityZoneHeaderInfo> actual = client.getSecurityZoneHeaders(Collections.emptyMap());
 
@@ -189,7 +188,7 @@ public class TestRangerClient {
     @Test
     public void testGetSecurityZoneServiceHeaders() throws Exception {
         RangerRESTClient    restClient = mock(RangerRESTClient.class);
-        ClientResponse      response   = mock(ClientResponse.class);
+        Response      response   = mock(Response.class);
         RangerClient        client     = new RangerClient(restClient);
 
         List<RangerServiceHeaderInfo> expected = new ArrayList<>();
@@ -199,7 +198,7 @@ public class TestRangerClient {
 
         when(restClient.get(anyString(), any())).thenReturn(response);
         when(response.getStatus()).thenReturn(GET_TEST_API.getExpectedStatus().getStatusCode());
-        when(response.getEntity(String.class)).thenReturn(JsonUtilsV2.listToJson(expected));
+        when(response.readEntity(String.class)).thenReturn(JsonUtilsV2.listToJson(expected));
 
         List<RangerServiceHeaderInfo> actual = client.getSecurityZoneServiceHeaders(Collections.emptyMap());
 

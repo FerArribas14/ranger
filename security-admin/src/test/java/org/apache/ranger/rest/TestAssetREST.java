@@ -27,10 +27,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.ranger.admin.client.datatype.RESTResponse;
@@ -673,7 +673,7 @@ public class TestAssetREST {
 		List<RangerPolicy> policies = new ArrayList<RangerPolicy>();
 		policies.add(rangerPolicy);
 		Mockito.when(request.getParameter("epoch")).thenReturn(strdt);
-		Mockito.when(request.getAttribute("javax.servlet.request.X509Certificate")).thenReturn(certchain);
+		Mockito.when(request.getAttribute("jakarta.servlet.request.X509Certificate")).thenReturn(certchain);
 		Mockito.when(request.getHeader("X-FORWARDED-FOR")).thenReturn("valid");
 		Mockito.when(request.isSecure()).thenReturn(true);
 		Mockito.when(request.getParameter("policyCount")).thenReturn("4");
@@ -696,7 +696,7 @@ public class TestAssetREST {
 		Mockito.verify(serviceUtil).getServiceByName("hdfs_dev");
 		Mockito.verify(serviceUtil).toVXAsset(rangerService);
 		Mockito.verify(request).getParameter("epoch");
-		Mockito.verify(request).getAttribute("javax.servlet.request.X509Certificate");
+		Mockito.verify(request).getAttribute("jakarta.servlet.request.X509Certificate");
 		Mockito.verify(request).getHeader("X-FORWARDED-FOR");
 		Mockito.verify(request).isSecure();
 		Mockito.verify(request).getParameter("policyCount");

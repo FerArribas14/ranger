@@ -50,20 +50,20 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Context;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -930,10 +930,11 @@ public class PublicAPIsv2 {
 	/*
     	This API is used to add users and groups with/without GRANT privileges to this Role. It follows add-or-update semantics
  	 */
-	@PUT
-	@Path("/api/roles/{id}/addUsersAndGroups")
-	@Consumes({ "application/json" })
-	@Produces({ "application/json" })
+//	ToDo: fixes jersey validations
+//	@PUT
+//	@Path("/api/roles/{id}/addUsersAndGroups")
+//	@Consumes({ "application/json" })
+//	@Produces({ "application/json" })
 	public RangerRole addUsersAndGroups(@PathParam("id") Long roleId, List<String> users, List<String> groups, Boolean isAdmin, @Context HttpServletRequest request) {
 		return roleREST.addUsersAndGroups(roleId, users, groups, isAdmin);
 	}
@@ -941,10 +942,11 @@ public class PublicAPIsv2 {
 	/*
         This API is used to remove users and groups, without regard to their GRANT privilege, from this Role.
      */
-	@PUT
-	@Path("/api/roles/{id}/removeUsersAndGroups")
-	@Consumes({ "application/json" })
-	@Produces({ "application/json" })
+//	ToDo: fixes jersey validations
+//	@PUT
+//	@Path("/api/roles/{id}/removeUsersAndGroups")
+//	@Consumes({ "application/json" })
+//	@Produces({ "application/json" })
 	public RangerRole removeUsersAndGroups(@PathParam("id") Long roleId, List<String> users, List<String> groups, @Context HttpServletRequest request) {
 		return roleREST.removeUsersAndGroups(roleId, users, groups);
 	}
@@ -952,10 +954,11 @@ public class PublicAPIsv2 {
 	/*
         This API is used to remove GRANT privilege from listed users and groups.
      */
-	@PUT
-	@Path("/api/roles/{id}/removeAdminFromUsersAndGroups")
-	@Consumes({ "application/json" })
-	@Produces({ "application/json" })
+//	ToDo: fixes jersey validations
+//	@PUT
+//	@Path("/api/roles/{id}/removeAdminFromUsersAndGroups")
+//	@Consumes({ "application/json" })
+//	@Produces({ "application/json" })
 	public RangerRole removeAdminFromUsersAndGroups(@PathParam("id") Long roleId, List<String> users, List<String> groups, @Context HttpServletRequest request) {
 		return roleREST.removeAdminFromUsersAndGroups(roleId, users, groups);
 	}

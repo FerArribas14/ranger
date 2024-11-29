@@ -23,14 +23,15 @@
 package org.apache.ranger.security.web.filter;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicReference;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.apache.ranger.biz.SessionMgr;
 import org.apache.ranger.biz.XUserMgr;
@@ -47,6 +48,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.filter.GenericFilterBean;
 
 public class RangerSecurityContextFormationFilter extends GenericFilterBean {
@@ -65,6 +67,8 @@ public class RangerSecurityContextFormationFilter extends GenericFilterBean {
 
 	@Autowired
 	GUIDUtil guidUtil;
+
+	@Autowired private TransactionTemplate transactionTemplate;
 		
 	String testIP = null;
 
@@ -75,8 +79,8 @@ public class RangerSecurityContextFormationFilter extends GenericFilterBean {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
-	 * javax.servlet.ServletResponse, javax.servlet.FilterChain)
+	 * @see jakarta.servlet.Filter#doFilter(jakarta.servlet.ServletRequest,
+	 * jakarta.servlet.ServletResponse, jakarta.servlet.FilterChain)
 	 */
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
@@ -121,16 +125,22 @@ public class RangerSecurityContextFormationFilter extends GenericFilterBean {
 
 				RangerContextHolder.setSecurityContext(context);
 				int authType = getAuthType(httpRequest);
-				UserSessionBase userSession = sessionMgr.processSuccessLogin(
-						authType, userAgent, httpRequest);
 
-				if (userSession != null) {
-					if (userSession.getClientTimeOffsetInMinute() == 0) {
-						userSession.setClientTimeOffsetInMinute(clientTimeOffset);
+				// ToDo: re-check this fix to transaction problem
+				AtomicReference<UserSessionBase> userSession = new AtomicReference<>();
+				transactionTemplate.execute(status -> {
+					userSession.set(sessionMgr.processSuccessLogin(
+							authType, userAgent, httpRequest));
+                    return null;
+                });
+
+				if (userSession.get() != null) {
+					if (userSession.get().getClientTimeOffsetInMinute() == 0) {
+						userSession.get().setClientTimeOffsetInMinute(clientTimeOffset);
 					}
 				}
 
-				context.setUserSession(userSession);
+				context.setUserSession(userSession.get());
 			}
 
 			setupAdminOpContext(request);

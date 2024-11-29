@@ -23,9 +23,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.WebApplicationException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.WebApplicationException;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
@@ -93,6 +93,7 @@ import org.apache.ranger.service.RangerServiceDefService;
 import org.apache.ranger.service.RangerServiceService;
 import org.apache.ranger.service.XUserService;
 import org.apache.ranger.view.*;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.FixMethodOrder;
@@ -107,7 +108,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import com.sun.jersey.core.header.FormDataContentDisposition;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 

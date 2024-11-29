@@ -26,23 +26,23 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.IntStream;
 
-import javax.annotation.Nonnull;
-import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -129,6 +129,8 @@ import org.apache.ranger.view.VXGroup;
 import org.apache.ranger.view.VXResponse;
 import org.apache.ranger.view.VXString;
 import org.apache.ranger.view.VXUser;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,8 +143,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.JsonSyntaxException;
-import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.multipart.FormDataParam;
 
 import static org.apache.ranger.plugin.store.EmbeddedServiceDefsUtil.EMBEDDED_SERVICEDEF_GDS_NAME;
 
@@ -582,9 +582,10 @@ public class ServiceREST {
 		return ret;
 	}
 
-	@GET
-	@Path("/policies/{serviceDefName}/for-resource")
-	@Produces({ "application/json" })
+//	ToDo: fixes jersey validations
+//	@GET
+//	@Path("/policies/{serviceDefName}/for-resource")
+//	@Produces({ "application/json" })
 	public List<RangerPolicy> getPoliciesForResource(@PathParam("serviceDefName") String serviceDefName,
 												  @DefaultValue("") @QueryParam("serviceName") String serviceName,
 												  @Context HttpServletRequest request) {
@@ -2103,9 +2104,10 @@ public class ServiceREST {
         return ret;
     }
 
-	@GET
-	@Path("/policies/downloadExcel")
-	@Produces("application/ms-excel")
+	//	ToDo: fixes jersey validations
+	//	@GET
+//	@Path("/policies/downloadExcel")
+//	@Produces("application/ms-excel")
 	public void getPoliciesInExcel(@Context HttpServletRequest request,
 			@Context HttpServletResponse response) {
 
@@ -2150,9 +2152,11 @@ public class ServiceREST {
 		}
 	}
 
-	@GET
-	@Path("/policies/csv")
-	@Produces("text/csv")
+
+	//	ToDo: fixes jersey validations
+	//	@GET
+//	@Path("/policies/csv")
+//	@Produces("text/csv")
 	public void getPoliciesInCsv(@Context HttpServletRequest request, @Context HttpServletResponse response) throws IOException {
 
 		if (LOG.isDebugEnabled()) {
@@ -2197,9 +2201,10 @@ public class ServiceREST {
 		}
 	}
 
-	@GET
-	@Path("/policies/exportJson")
-	@Produces("text/json")
+	//	ToDo: fixes jersey validations
+//	@GET
+//	@Path("/policies/exportJson")
+//	@Produces("text/json")
 	public void getPoliciesInJson(@Context HttpServletRequest request,
 			@Context HttpServletResponse response,
 			@QueryParam("checkPoliciesExists") Boolean checkPoliciesExists) {
