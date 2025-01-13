@@ -46,7 +46,7 @@ Add the following dependency to pom.xml
 <dependency>
     <groupId>org.apache.ranger</groupId>
     <artifactId>ranger-intg</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.0</version>
     <scope>compile</scope>
 </dependency>
 ```

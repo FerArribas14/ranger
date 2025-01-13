@@ -21,6 +21,7 @@ package org.apache.ranger.server.tomcat;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,6 +40,8 @@ import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.config.Lookup;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.impl.auth.SPNegoSchemeFactory;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.ssl.SSLContexts;
 import org.apache.ranger.authorization.credutils.CredentialsProviderUtil;
 import org.apache.ranger.authorization.credutils.kerberos.KerberosCredentialsProvider;
 import org.apache.ranger.credentialapi.CredentialReader;
@@ -52,6 +55,8 @@ import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.xcontent.XContentType;
+
+import javax.net.ssl.SSLContext;
 
 
 public class ElasticSearchIndexBootStrapper extends Thread {
@@ -70,6 +75,12 @@ public class ElasticSearchIndexBootStrapper extends Thread {
 	private static final String ES_CREDENTIAL_PROVIDER_PATH = "ranger.credential.provider.path";
 	private static final String ES_CREDENTIAL_ALIAS = "ranger.audit.elasticsearch.credential.alias";
 	private static final String ES_BOOTSTRAP_MAX_RETRY = "ranger.audit.elasticsearch.max.retry";
+
+	private static final String ES_TRUSTSTORE_PATH = "ranger.audit.elasticsearch.truststore.path";
+	private static final String ES_TRUSTSTORE_PASSWORD = "ranger.audit.elasticsearch.truststore.password";
+	private static final String ES_KEYSTORE_PATH = "ranger.audit.elasticsearch.keystore.path";
+	private static final String ES_KEYSTORE_PASSWORD = "ranger.audit.elasticsearch.keystore.password";
+
 
 	private static final String DEFAULT_INDEX_NAME = "ranger_audits";
 	private static final String ES_RANGER_AUDIT_SCHEMA_FILE = "ranger_es_schema.json";
@@ -182,8 +193,37 @@ public class ElasticSearchIndexBootStrapper extends Thread {
 
 	private void createClient() {
 		try {
-			RestClientBuilder restClientBuilder =
-					getRestClientBuilder(hosts, protocol, user, password, port);
+			RestClientBuilder restClientBuilder = getRestClientBuilder(hosts, protocol, user, password, port);
+
+			// Configuración SSL
+			String trustStorePath = EmbeddedServerUtil.getConfig(ES_TRUSTSTORE_PATH,"");
+			String trustStorePassword = EmbeddedServerUtil.getConfig(ES_TRUSTSTORE_PASSWORD,"");
+			String keyStorePath = EmbeddedServerUtil.getConfig(ES_KEYSTORE_PATH,"");
+			String keyStorePassword = EmbeddedServerUtil.getConfig(ES_KEYSTORE_PASSWORD,"");
+
+			if (StringUtils.isNotBlank(trustStorePath) && StringUtils.isNotBlank(trustStorePassword) &&
+					StringUtils.isNotBlank(keyStorePath) && StringUtils.isNotBlank(keyStorePassword)) {
+
+				KeyStore truststore = KeyStore.getInstance("jks");
+				try (InputStream is = Files.newInputStream(Paths.get(trustStorePath))) {
+					truststore.load(is, trustStorePassword.toCharArray());
+				}
+
+				KeyStore keystore = KeyStore.getInstance("jks");
+				try (InputStream is = Files.newInputStream(Paths.get(keyStorePath))) {
+					keystore.load(is, keyStorePassword.toCharArray());
+				}
+
+				SSLContextBuilder sslBuilder = SSLContexts.custom()
+						.loadTrustMaterial(truststore, null)
+						.loadKeyMaterial(keystore, keyStorePassword.toCharArray());
+				final SSLContext sslContext = sslBuilder.build();
+
+				restClientBuilder.setHttpClientConfigCallback(httpClientBuilder ->
+						httpClientBuilder.setSSLContext(sslContext)
+				);
+			}
+
 			client = new RestHighLevelClient(restClientBuilder);
 		} catch (Throwable t) {
 			lastLoggedAt.updateAndGet(lastLoggedAt -> {
