@@ -56,6 +56,10 @@
                     <artifactId>commons-compress</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-server</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>org.apache.kerby</groupId>
                     <artifactId>kerb-admin</artifactId>
                 </exclusion>
